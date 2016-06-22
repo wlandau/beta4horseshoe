@@ -1,0 +1,45 @@
+sources: code.R
+packages: 
+  - fbseq
+  - rmarkdown
+  - VGAM
+  - xtable
+targets:
+
+  all:
+    depends:
+      - report.pdf
+
+  chain_list:
+    command: readRDS("chain_list.rds")
+
+  est:
+    command: estimates(chain_list)
+
+  truth:
+    command: get_truth(chain_list)
+
+  beta4:
+    command: get_beta4(est, truth)
+ 
+  intervals:
+    command: cis(beta4)
+
+  rates.tex:
+    command: rates(intervals)
+
+  lower.pdf:
+    command: plot_lower(intervals)
+    plot: TRUE
+
+  upper.pdf:
+    command: plot_upper(intervals)
+    plot: TRUE
+
+  report.pdf:
+    command: system(I("pdflatex report.tex"), intern = TRUE)
+    depends:
+      - lower.pdf
+      - upper.pdf
+      - rates.tex
+  
